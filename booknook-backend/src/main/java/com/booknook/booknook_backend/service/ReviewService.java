@@ -4,6 +4,7 @@ import com.booknook.booknook_backend.model.Book;
 import com.booknook.booknook_backend.model.Review;
 import com.booknook.booknook_backend.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,7 +26,7 @@ public class ReviewService {
     public Review createReview(Review review) {
         return reviewRepository.save(review);
     }
-
+    @PreAuthorize("hasRole('ADMIN') or @reviewRepository.findById(#id).get().getUser().getId() == authentication.principal.id")
     public Review updateReview(Long id, Review reviewDetails) {
         Review review = reviewRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Review with id " + id + " does not exist"));
@@ -39,7 +40,7 @@ public class ReviewService {
     public List<Review> getReviewsByBookId(Long bookId) {
         return reviewRepository.findByBookId(bookId);
     }
-
+    @PreAuthorize("hasRole('ADMIN') or @reviewRepository.findById(#id).get().getUser().getId() == authentication.principal.id")
     public void deleteReview(Long id) {
         boolean exists = reviewRepository.existsById(id);
         if (!exists) {

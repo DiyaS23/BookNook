@@ -1,9 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import { Book, Users, Library, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/context/AuthProvider";
+import { LogIn, LogOut, User } from "lucide-react";
 
 const Navigation = () => {
   const location = useLocation();
+  const { user, logout } = useAuth();
 
   const navItems = [
     { path: "/", label: "Home", icon: Home },
@@ -45,6 +48,35 @@ const Navigation = () => {
                 </Button>
               );
             })}
+            {user ? (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to={`/users/${user.id}`} className="flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span>{user.username}</span>
+                  </Link>
+                </Button>
+                <Button variant="secondary" size="sm" onClick={logout} className="flex items-center space-x-2">
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link to="/login" className="flex items-center space-x-2">
+                    <LogIn className="h-4 w-4" />
+                    <span>Login</span>
+                  </Link>
+                </Button>
+                <Button variant="secondary" size="sm" asChild>
+                  <Link to="/register" className="flex items-center space-x-2">
+                    <User className="h-4 w-4" />
+                    <span>Register</span>
+                  </Link>
+                </Button>
+              </>
+            )}
           </div>
 
           <div className="md:hidden">

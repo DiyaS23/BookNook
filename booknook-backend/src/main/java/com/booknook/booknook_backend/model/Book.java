@@ -93,17 +93,14 @@ public class Book {
         this.genre = genre;
     }
 
-    // A book can have many reviews
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Review> reviews;
 
-    // A book can have many quotes
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Quote> quotes;
 
-    // A book can be in many reading lists
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ReadingList> readingLists;

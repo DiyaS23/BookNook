@@ -7,11 +7,13 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from 'axios';
+import { useAuth } from "@/context/AuthProvider";
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
 const EditBook = () => {
   const { id } = useParams();
+  const { authAxios, isAdmin } = useAuth();
   const [bookData, setBookData] = useState({
     title: "",
     author: "",
@@ -52,25 +54,39 @@ const EditBook = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isAdmin) {
+        toast({ title: "Error", description: "Only administrators can edit books.", variant: "destructive" });
+        setSubmitting(false);
+        return;
+    }
     setSubmitting(true);
     try {
-      await axios.put(`${API_BASE_URL}/books/${id}`, bookData);
+      await authAxios.put(`${API_BASE_URL}/books/${id}`, bookData);
       toast({
         title: "Success",
         description: "Book updated successfully!",
       });
       navigate(`/books/${id}`);
     } catch (error) {
+      const errorMsg = error.response?.status === 403 ? "Access Denied: You must be an administrator." : "Failed to update book. Please try again.";
       toast({
         title: "Error",
-        description: "Failed to update book. Please try again.",
+        description: errorMsg,
         variant: "destructive",
       });
     } finally {
       setSubmitting(false);
     }
   };
-
+if (!loading && !isAdmin) {
+    return (
+      <div className="text-center py-16">
+        <h3 className="text-lg font-medium mb-2">Access Denied</h3>
+        <p className="text-muted-foreground">You must be an administrator to edit books.</p>
+        <Button asChild><Link to="/books">Back to Books</Link></Button>
+      </div>
+    );
+  }
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-64">

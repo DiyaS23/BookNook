@@ -7,12 +7,13 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ArrowLeft, Edit, Mail, Book as BookIcon, Library, Heart } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from 'axios';
-
+import { useAuth } from "@/context/AuthProvider";
 const API_BASE_URL = 'http://localhost:8080/api';
 
 const UserDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user: authUser, isAdmin } = useAuth();
   const [user, setUser] = useState(null);
   const [readingLists, setReadingLists] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -116,12 +117,14 @@ const UserDetail = () => {
             </div>
           )}
           <div className="flex gap-2 pt-4">
-            <Button variant="secondary" asChild className="flex-1">
-              <Link to={`/users/edit/${user.id}`} className="flex items-center space-x-2">
-                <Edit className="h-4 w-4" />
-                <span>Edit Profile</span>
-              </Link>
-            </Button>
+            {(isAdmin || (authUser && authUser.id.toString() === id)) && (
+                <Button variant="secondary" asChild className="flex-1">
+                    <Link to={`/users/edit/${user.id}`} className="flex items-center space-x-2">
+                        <Edit className="h-4 w-4" />
+                        <span>Edit Profile</span>
+                    </Link>
+                </Button>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -6,12 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Edit, Library, Book as BookIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from 'axios';
+import { useAuth } from "@/context/AuthProvider";
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
 const ReadingListDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+     const { user: authUser, isAdmin } = useAuth();
     const [readingList, setReadingList] = useState(null);
     const [loading, setLoading] = useState(true);
     const { toast } = useToast();
@@ -88,12 +90,14 @@ const ReadingListDetail = () => {
                 </CardContent>
             </Card>
 
-            <Button variant="secondary" asChild>
-                <Link to={`/reading-lists/edit/${readingList.id}`} className="flex items-center space-x-2">
-                    <Edit className="h-4 w-4" />
-                    <span>Edit List</span>
-                </Link>
-            </Button>
+            {(isAdmin || (authUser && readingList.user?.id === authUser.id)) && (
+                <Button variant="secondary" asChild>
+                    <Link to={`/reading-lists/edit/${readingList.id}`} className="flex items-center space-x-2">
+                        <Edit className="h-4 w-4" />
+                        <span>Edit List</span>
+                    </Link>
+                </Button>
+            )}
         </div>
     );
 };

@@ -4,6 +4,7 @@ import com.booknook.booknook_backend.model.Book;
 import com.booknook.booknook_backend.model.Quote;
 import com.booknook.booknook_backend.repository.QuoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,6 +25,7 @@ public class QuoteService {
     public Optional<Quote> getQuoteById(Long id) {
         return quoteRepository.findById(id);
     }
+    @PreAuthorize("hasRole('ADMIN') or @quoteRepository.findById(#id).get().getUser().getId() == authentication.principal.id")
     public Quote updateQuote(Long id, Quote quoteDetails) {
         Quote quote = quoteRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Quote with id " + id + " does not exist"));
@@ -33,7 +35,7 @@ public class QuoteService {
 
         return quoteRepository.save(quote);
     }
-
+    @PreAuthorize("hasRole('ADMIN') or @quoteRepository.findById(#id).get().getUser().getId() == authentication.principal.id")
     public void deleteQuote(Long id) {
         boolean exists = quoteRepository.existsById(id);
         if (!exists) {

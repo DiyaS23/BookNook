@@ -17,6 +17,8 @@ import EditUser from "./pages/EditUser";
 import UserDetail from "./pages/UserDetail";
 import AddReadingList from "./pages/AddReadingList"; 
 import ReadingListDetail from "./pages/ReadingListDetail";
+import Login from "./pages/Login";
+import { AuthProvider, useAuth } from "@/context/AuthProvider";
 
 const queryClient = new QueryClient();
 
@@ -26,15 +28,17 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
+      <AuthProvider>
         <Layout>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/books" element={<Books />} />
             <Route path="/books/add" element={<AddBook />} /> 
             <Route path="/books/:id" element={<BookDetail />} />
             <Route path="/books/edit/:id" element={<EditBook />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/users/add" element={<AddUser />} /> 
+            <Route path="/register" element={<AddUser />} /> 
             <Route path="/users/edit/:id" element={<EditUser />} />
             <Route path="/users/:id" element={<UserDetail />} />
             <Route path="/reading-lists" element={<ReadingLists />} />
@@ -43,6 +47,7 @@ const App = () => (
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Layout>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

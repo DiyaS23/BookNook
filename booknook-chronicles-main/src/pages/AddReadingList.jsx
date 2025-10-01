@@ -7,17 +7,18 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from 'axios';
+import { useAuth } from "@/context/AuthProvider";
 
 const API_BASE_URL = 'http://localhost:8080/api';
-// NOTE: You'll need to replace this with the actual authenticated user's ID
-const CURRENT_USER_ID = 2;
+
 
 const AddReadingList = () => {
+  const { authAxios, user } = useAuth(); 
   const [listData, setListData] = useState({
     name: "",
     description: "",
     status: "Planning",
-    userId: CURRENT_USER_ID
+    userId: user?.id 
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -37,10 +38,10 @@ const AddReadingList = () => {
         name: listData.name,
         description: listData.description,
         status: listData.status,
-        user: { id: listData.userId }
+        user: { id: user.id } 
       };
       
-      await axios.post(`${API_BASE_URL}/readinglists`, payload);
+      await authAxios.post(`${API_BASE_URL}/readinglists`, payload); 
       toast({
         title: "Success",
         description: "Reading list created successfully!",

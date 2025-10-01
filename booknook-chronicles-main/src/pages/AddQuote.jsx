@@ -6,17 +6,16 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import axios from 'axios';
+import { useAuth } from "@/context/AuthProvider";
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
-// You will need to get the current user ID, likely from authentication state
-const CURRENT_USER_ID = 2;
-
 const AddQuote = ({ bookId }) => {
+  const { authAxios, user } = useAuth();
   const [quoteData, setQuoteData] = useState({
     quoteText: "",
     pageNumber: "",
-    userId: CURRENT_USER_ID,
+    userId: user?.id,
     bookId: bookId
   });
   const [loading, setLoading] = useState(false);
@@ -27,39 +26,24 @@ const AddQuote = ({ bookId }) => {
     setQuoteData(prevData => ({ ...prevData, [id]: value }));
   };
 
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-//     setLoading(true);
-//     try {
-//       await axios.post(`${API_BASE_URL}/quotes`, quoteData);
-//       toast({
-//         title: "Success",
-//         description: "Quote added successfully!",
-//       });
-//       // Optionally, refresh the parent component to show the new quote
-//     } catch (error) {
-//       toast({
-//         title: "Error",
-//         description: "Failed to add quote. Please try again.",
-//         variant: "destructive",
-//       });
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
 const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+         toast({ title: "Error", description: "You must be logged in to post a quote.", variant: "destructive" });
+         setLoading(false);
+         return;
+    }
+
     setLoading(true);
     try {
-      // ⬅️ Correctly format the payload with nested objects
       const payload = {
         quoteText: quoteData.quoteText,
         pageNumber: quoteData.pageNumber,
-        user: { id: CURRENT_USER_ID }, // Pass the user object with its ID
+        user: { id: user.id }, // Pass the user object with its ID
         book: { id: bookId }           // Pass the book object with its ID
       };
 
-      await axios.post(`${API_BASE_URL}/quotes`, payload);
+      await authAxios.post(`${API_BASE_URL}/quotes`, payload);
       toast({
         title: "Success",
         description: "Quote added successfully!",

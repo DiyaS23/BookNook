@@ -3,6 +3,7 @@ import com.booknook.booknook_backend.model.ReadingList;
 import com.booknook.booknook_backend.model.User;
 import com.booknook.booknook_backend.repository.ReadingListRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,13 +17,13 @@ public class ReadingListService {
         this.readingListRepository = readingListRepository;
     }
 
-
     public ReadingList createReadingList(ReadingList list) {
         return readingListRepository.save(list);
     }
     public Optional<ReadingList> getReadingListById(Long id) {
         return readingListRepository.findById(id);
     }
+    @PreAuthorize("hasRole('ADMIN') or @readingListRepository.findById(#id).get().getUser().getId() == authentication.principal.id")
     public ReadingList updateReadingList(Long id, ReadingList listDetails) {
         ReadingList readingList = readingListRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Reading list entry with id " + id + " does not exist"));
@@ -35,7 +36,7 @@ public class ReadingListService {
     public List<ReadingList> getReadingListsByUserId(Long userId) {
         return readingListRepository.findByUserId(userId);
     }
-
+    @PreAuthorize("hasRole('ADMIN') or @readingListRepository.findById(#id).get().getUser().getId() == authentication.principal.id")
     public void deleteReadingList(Long id) {
         boolean exists = readingListRepository.existsById(id);
         if (!exists) {

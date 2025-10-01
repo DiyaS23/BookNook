@@ -31,7 +31,17 @@ public class User {
     private String bio;
     private int booksRead = 0;
     private String favoriteGenre;
+    @Column(nullable = false)
+    private String role = "USER";
     private LocalDateTime joinDate = LocalDateTime.now();
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public int getBooksRead() {
         return booksRead;
@@ -57,17 +67,14 @@ public class User {
         this.joinDate = joinDate;
     }
 
-    // A user has many reading lists
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<ReadingList> readingLists;
 
-    // A user can write many reviews
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Review> reviews;
 
-    // A user can add many quotes
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Quote> quotes;

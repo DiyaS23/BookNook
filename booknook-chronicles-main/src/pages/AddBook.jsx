@@ -7,10 +7,12 @@ import { Label } from "@/components/ui/label";
 import { ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import axios from 'axios';
+import { useAuth } from "@/context/AuthProvider";
 
 const API_BASE_URL = 'http://localhost:8080/api';
 
 const AddBook = () => {
+  const { authAxios, isAdmin, user } = useAuth();
   const [bookData, setBookData] = useState({
     title: "",
     author: "",
@@ -31,9 +33,14 @@ const AddBook = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!isAdmin) {
+         toast({ title: "Error", description: "Only administrators can add books.", variant: "destructive" });
+         setLoading(false);
+         return;
+    }
     setLoading(true);
     try {
-      await axios.post(`${API_BASE_URL}/books`, bookData);
+     await authAxios.post(`${API_BASE_URL}/books`, bookData); 
       toast({
         title: "Success",
         description: "Book added successfully!",
@@ -49,7 +56,14 @@ const AddBook = () => {
       setLoading(false);
     }
   };
-
+if (!user || !isAdmin) {
+      return (
+          <div className="text-center py-16">
+              <h3 className="text-lg font-medium mb-2">Access Denied</h3>
+              <p className="text-muted-foreground">You must be an administrator to add new books.</p>
+          </div>
+      );
+  }
   return (
     <div className="space-y-8">
       <div className="flex items-center space-x-4">
